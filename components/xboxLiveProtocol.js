@@ -1,0 +1,104 @@
+/* ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is the Xbox LIVE.
+ *
+ * The Initial Developer of the Original Code is
+ * Patrick Cloke <clokep@gmail.com>.
+ * Portions created by the Initial Developer are Copyright (C) 2011
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s):
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * either the GNU General Public License Version 2 or later (the "GPL"), or
+ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+ * in which case the provisions of the GPL or the LGPL are applicable instead
+ * of those above. If you wish to allow use of your version of this file only
+ * under the terms of either the GPL or the LGPL, and not to allow others to
+ * use your version of this file under the terms of the MPL, indicate your
+ * decision by deleting the provisions above and replace them with the notice
+ * and other provisions required by the GPL or the LGPL. If you do not delete
+ * the provisions above, a recipient may use your version of this file under
+ * the terms of any one of the MPL, the GPL or the LGPL.
+ *
+ * ***** END LICENSE BLOCK ***** */
+
+var Cc = Components.classes;
+var Ci = Components.interfaces;
+var Cu = Components.utils;
+
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.import("resource:///modules/jsProtoHelper.jsm");
+Cu.import("resource://xbox-live/utils.jsm");
+
+Components.utils.import("resource:///modules/imServices.jsm");
+
+function Account(aProtoInstance, aKey, aName) {
+  this._init(aProtoInstance, aKey, aName);
+  this._gamercards = ["DarkJedi613"];
+}
+Account.prototype = {
+  connect: function() {
+    this._loadGamercards();
+
+    this.base.connected();
+  },
+
+  // When the user clicks "Disconnect" in account manager
+  disconnect: function() {
+    this.base.disconnecting(this._base.NO_ERROR, "Sending the QUIT message");
+    this.base.disconnected();
+  },
+
+  /*createConversation: function(aName) { },
+
+  // aComponents implements purpleIChatRoomFieldValues
+  joinChat: function(aComponents) { },
+
+  chatRoomFields: { },
+
+  parseDefaultChatName: function(aDefaultChatName) { },
+
+  // Attributes
+  get canJoinChat() false,*/
+
+  // Private Functions
+  _loadGamercards: function() {
+    dump("Hi");
+  }
+};
+Account.prototype.__proto__ = GenericAccountPrototype;
+
+function Protocol() {
+  this.registerCommands();
+}
+Protocol.prototype = {
+  get name() "Xbox LIVE",
+  get iconBaseURI() "chrome://prpl-xbox-live/skin/",
+  get baseId() "prpl-xbox-live",
+
+  usernameSplits: [ ],
+
+  options: { },
+
+  commands: [ ],
+
+  get chatHasTopic() false,
+
+  getAccount: function(aKey, aName) new Account(this, aKey, aName),
+  classID: Components.ID("{2528dd21-0ab9-469b-ba6b-894c0fb7e8c0}")
+};
+Protocol.prototype.__proto__ = GenericProtocolPrototype;
+
+const NSGetFactory = XPCOMUtils.generateNSGetFactory([Protocol]);

@@ -1,0 +1,6 @@
+resource	xbox-live 	    modules/
+skin      prpl-xbox-live   classic/1.0  chrome/skin/prpl/
+
+component {2528dd21-0ab9-469b-ba6b-894c0fb7e8c0} components/xboxLiveProtocol.js
+contract @instantbird.org/purple/xbox-live;1 {2528dd21-0ab9-469b-ba6b-894c0fb7e8c0}
+category js-protocol-plugin @instantbird.org/purple/xbox-live;1 @instantbird.org/purple/xbox-live;1
