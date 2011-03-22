@@ -15,8 +15,8 @@
  * 2010.
  *
  * The Initial Developer of the Original Code is
- * Patrick Cloke <clokep@gmail.com>
- * Portions created by the Initial Developer are Copyright (C) 2010
+ * Patrick Cloke <clokep@gmail.com>.
+ * Portions created by the Initial Developer are Copyright (C) 2011
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -35,14 +35,25 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-var EXPORTED_SYMBOLS = ["dump"];
+var EXPORTED_SYMBOLS = ["dump", "gamercardURL", "HTMLParser"];
 
-var Cc = Components.classes;
-var Ci = Components.interfaces;
-var Cu = Components.utils;
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
+
+Cu.import("resource:///modules/imServices.jsm");
 
 function dump(str) {
-  Cc["@mozilla.org/consoleservice;1"]
-    .getService(Ci.nsIConsoleService)
-    .logStringMessage(str);
+  Services.console.logStringMessage(str);
+}
+
+const gamercardURL = function(gamertag) {
+  return "http://gamercard.xbox.com/en-US/" + encodeURI(gamertag) + ".card";
+}
+
+// http://forums.mozillazine.org/viewtopic.php?p=8245775&sid=6f2be262d44949a486cab09103a77707#p8245775
+function HTMLParser(aHTMLString){
+  var parsedDOM = document.createElement('div');
+  parsedDOM.appendChild(Cc["@mozilla.org/feed-unescapehtml;1"]
+                          .getService(Ci.nsIScriptableUnescapeHTML)
+                          .parseFragment(aHTMLString, false, null, parsedDOM));
+  return parsedDOM;
 }

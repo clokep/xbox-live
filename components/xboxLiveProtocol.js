@@ -34,19 +34,25 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-var Cc = Components.classes;
-var Ci = Components.interfaces;
-var Cu = Components.utils;
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
+const XBOX_LIVE_TAG_NAME = "Xbox LIVE";
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource:///modules/jsProtoHelper.jsm");
 Cu.import("resource://xbox-live/utils.jsm");
 
-Components.utils.import("resource:///modules/imServices.jsm");
+Cu.import("resource:///modules/imServices.jsm");
+
+const xblTag = Services.tags.getTagByName(XBOX_LIVE_TAG_NAME) ||
+               Services.tags.createTag(XBOX_LIVE_TAG_NAME);
+
+function XboxLIVEGamercard(name) {
+
+}
 
 function Account(aProtoInstance, aKey, aName) {
   this._init(aProtoInstance, aKey, aName);
-  this._gamercards = ["DarkJedi613"];
+  this._gamercards = ["Major Nelson", "DarkJedi613"];
 }
 Account.prototype = {
   connect: function() {
@@ -61,21 +67,27 @@ Account.prototype = {
     this.base.disconnected();
   },
 
-  /*createConversation: function(aName) { },
-
-  // aComponents implements purpleIChatRoomFieldValues
-  joinChat: function(aComponents) { },
-
-  chatRoomFields: { },
-
-  parseDefaultChatName: function(aDefaultChatName) { },
-
   // Attributes
-  get canJoinChat() false,*/
+  get canJoinChat() false,
 
   // Private Functions
   _loadGamercards: function() {
     dump("Hi");
+    for each (let gamertag in this._gamercards) {
+      dump("Accesssing: " + gamercardURL(gamertag));
+      doXHRequest(gamercardURL(gamertag), null, null, this._addGamercards,
+                  this._handleError, this);
+    }
+  },
+
+  _addGamercards: function(aResponseText) {
+    dump(aResponseText);
+    let dom = HTMLParser(aResponseText);
+    this.addBuddy(xblTag, "DarkJedi613");
+  },
+
+  _handleError: function(aStatusText) {
+    Cu.reportError(aStatusText);
   }
 };
 Account.prototype.__proto__ = GenericAccountPrototype;
