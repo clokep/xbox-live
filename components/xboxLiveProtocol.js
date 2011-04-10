@@ -43,18 +43,18 @@ Cu.import("resource://xbox-live/utils.jsm");
 
 Cu.import("resource:///modules/imServices.jsm");
 
-const xblTag = Services.tags.getTagByName(XBOX_LIVE_TAG_NAME) ||
-               Services.tags.createTag(XBOX_LIVE_TAG_NAME);
-
-function XboxLIVEGamercard(name) {
-
-}
+var xblTag;
 
 function Account(aProtoInstance, aKey, aName) {
   this._init(aProtoInstance, aKey, aName);
   this._gamercards = ["Major Nelson", "DarkJedi613"];
+
+  xblTag = Services.tags.getTagByName(XBOX_LIVE_TAG_NAME) ||
+           Services.tags.createTag(XBOX_LIVE_TAG_NAME);
 }
 Account.prototype = {
+  __proto__: GenericAccountPrototype,
+
   connect: function() {
     this._loadGamercards();
 
@@ -84,18 +84,21 @@ Account.prototype = {
     dump(aResponseText);
     let dom = HTMLParser(aResponseText);
     this.addBuddy(xblTag, "DarkJedi613");
+
+    let buddy = Services.contacts.getBuddyByNameAndProtocol("DarkJedi613",
+                                                            this.protocol);
   },
 
   _handleError: function(aStatusText) {
     Cu.reportError(aStatusText);
   }
 };
-Account.prototype.__proto__ = GenericAccountPrototype;
 
 function Protocol() {
   this.registerCommands();
 }
 Protocol.prototype = {
+  __proto__: GenericProtocolPrototype,
   get name() "Xbox LIVE",
   get iconBaseURI() "chrome://prpl-xbox-live/skin/",
   get baseId() "prpl-xbox-live",
@@ -111,6 +114,5 @@ Protocol.prototype = {
   getAccount: function(aKey, aName) new Account(this, aKey, aName),
   classID: Components.ID("{2528dd21-0ab9-469b-ba6b-894c0fb7e8c0}")
 };
-Protocol.prototype.__proto__ = GenericProtocolPrototype;
 
 const NSGetFactory = XPCOMUtils.generateNSGetFactory([Protocol]);
